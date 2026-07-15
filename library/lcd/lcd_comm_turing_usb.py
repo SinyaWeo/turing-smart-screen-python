@@ -19,7 +19,6 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 import os
-import platform
 import queue
 import shutil
 import struct
@@ -467,9 +466,7 @@ def find_usb_device():
             dev = usb.core.find(idVendor=VENDOR_ID, idProduct=pid)
         except usb.core.NoBackendError as e:
             print("""[ERROR] %s: libusb could not be loaded from your system. Make sure it is installed.
-On Linux and BSD, these will generally be available on the distribution's official repositories.
-On macOS, libusb 1.0 can easily be installed through Homebrew: brew install libusb
-On Windows, manually copy 'external/libusb-1.0/libusb-1.0.dll' to C:\\Windows\\System32""" % str(
+On Linux and BSD, these will generally be available on the distribution's official repositories.""" % str(
                 e))
             try:
                 sys.exit(0)
@@ -487,12 +484,11 @@ On Windows, manually copy 'external/libusb-1.0/libusb-1.0.dll' to C:\\Windows\\S
     except usb.core.USBError as e:
         print("Warning: set_configuration() failed:", e)
 
-    if platform.system() == "Linux":
-        try:
-            if dev.is_kernel_driver_active(0):
-                dev.detach_kernel_driver(0)
-        except usb.core.USBError as e:
-            print("Warning: detach_kernel_driver failed:", e)
+    try:
+        if dev.is_kernel_driver_active(0):
+            dev.detach_kernel_driver(0)
+    except usb.core.USBError as e:
+        print("Warning: detach_kernel_driver failed:", e)
 
     return dev, dev_pid
 

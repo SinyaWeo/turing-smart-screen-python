@@ -8,7 +8,7 @@ permissions:
   contents: write
 
 jobs:
-  generate-windows-installer:
+  generate-linux-packages:
     name: Generate Linux Packages
     runs-on: ubuntu-latest
 

@@ -41,10 +41,9 @@ from library.lcd.lcd_comm_weact_b import LcdCommWeActB
 from library.lcd.lcd_simulated import LcdSimulated
 from library.log import logger
 
-# Set your COM port e.g. COM3 for Windows, /dev/ttyACM0 for Linux, etc.
-# Use AUTO for COM port auto-discovery (may not work on every setup) or if device is not detected as a COM port
+# Set your serial port e.g. /dev/ttyACM0
+# Use AUTO for port auto-discovery (may not work on every setup) or if device is not detected as a serial port
 # COM_PORT = "/dev/ttyACM0"
-# COM_PORT = "COM5"
 COM_PORT = "AUTO"
 
 # Display revision: see config.yaml comments for values
@@ -69,9 +68,7 @@ if __name__ == "__main__":
     # Set the signal handlers, to send a complete frame to the LCD before exit
     signal.signal(signal.SIGINT, sighandler)
     signal.signal(signal.SIGTERM, sighandler)
-    is_posix = os.name == 'posix'
-    if is_posix:
-        signal.signal(signal.SIGQUIT, sighandler)
+    signal.signal(signal.SIGQUIT, sighandler)
 
     # Build your LcdComm object based on the HW revision
     lcd_comm = None

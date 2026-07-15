@@ -26,7 +26,6 @@ from library.pythoncheck import check_python_version
 check_python_version()
 
 import os
-import platform
 import subprocess
 import sys
 import webbrowser
@@ -151,7 +150,7 @@ model_and_size_to_revision_map = {
     (SIMULATED_MODEL, SIZE_8_INCH): 'SIMU',
     (SIMULATED_MODEL, SIZE_8_8_INCH): 'SIMU',
 }
-hw_lib_map = {"AUTO": "Automatic", "LHM": "LibreHardwareMonitor (admin.)", "PYTHON": "Python libraries",
+hw_lib_map = {"AUTO": "Automatic", "PYTHON": "Python libraries",
               "STUB": "Fake random data", "STATIC": "Fake static data"}
 reverse_map = {False: "classic", True: "reverse"}
 weather_unit_map = {"metric": "metric - °C", "imperial": "imperial - °F", "standard": "standard - °K"}
@@ -175,22 +174,14 @@ DISABLED_COLOR = "#C0C0C0"
 
 
 def emoji_to_img(size, text):
-    # Use platform-specific emoji font
-    if sys.platform == "win32":
-        font = ImageFont.truetype("seguiemj.ttf", size=int(round(size * 72 / 96, 0)))
-        # pixels = points * 96 / 72 : 96 is windowsDPI
-        im = Image.new("RGBA", (size, size), (255, 255, 255, 0))
-        draw = ImageDraw.Draw(im)
-        draw.text((size / 2, size / 2), text, embedded_color=True, font=font, anchor="mm")
-    else:
-        emoji_font = str(MAIN_DIRECTORY / "res" / "fonts" / "NotoColorEmoji" / "NotoColorEmoji.ttf")
-        # Noto Color Emoji font can only be used with size=109
-        font = ImageFont.truetype(emoji_font, size=109)
-        bbox = font.getbbox(text)
-        im = Image.new("RGBA", bbox[2:], (255, 255, 255, 0))
-        draw = ImageDraw.Draw(im)
-        draw.text((0,0), text, embedded_color=True, font=font)
-        im.thumbnail((size, size), Image.Resampling.LANCZOS)
+    emoji_font = str(MAIN_DIRECTORY / "res" / "fonts" / "NotoColorEmoji" / "NotoColorEmoji.ttf")
+    # Noto Color Emoji font can only be used with size=109
+    font = ImageFont.truetype(emoji_font, size=109)
+    bbox = font.getbbox(text)
+    im = Image.new("RGBA", bbox[2:], (255, 255, 255, 0))
+    draw = ImageDraw.Draw(im)
+    draw.text((0, 0), text, embedded_color=True, font=font)
+    im.thumbnail((size, size), Image.Resampling.LANCZOS)
     return ImageTk.PhotoImage(im)
 
 
@@ -319,8 +310,6 @@ class TuringConfigWindow:
 
         self.hwlib_label = ttk.Label(self.window, text='Hardware monitoring')
         self.hwlib_label.place(x=370, y=340)
-        if sys.platform != "win32":
-            del hw_lib_map["LHM"]  # LHM is for Windows platforms only
         self.hwlib_cb = ttk.Combobox(self.window, values=list(hw_lib_map.values()), state='readonly')
         self.hwlib_cb.place(x=550, y=335, width=250)
         self.hwlib_cb.bind('<<ComboboxSelected>>', self.on_hwlib_change)
@@ -335,11 +324,6 @@ class TuringConfigWindow:
         self.wl_cb = ttk.Combobox(self.window, values=get_net_if(), state='readonly')
         self.wl_cb.place(x=550, y=415, width=250)
 
-        # For Windows platform only
-        self.lhm_admin_warning = ttk.Label(self.window,
-                                           text="❌ Restart as admin. or select another Hardware monitoring",
-                                           foreground='#f00')
-        # For platform != Windows
         self.cpu_fan_label = ttk.Label(self.window, text='CPU fan (？)')
         self.cpu_fan_label.config(foreground="#a3a3ff", cursor="hand2")
         self.cpu_fan_cb = ttk.Combobox(self.window, values=get_fans(), state='readonly')
@@ -559,13 +543,7 @@ class TuringConfigWindow:
 
     def on_open_theme_folder_click(self):
         path = MAIN_DIRECTORY / "res/themes"
-
-        if platform.system() == "Windows":
-            os.startfile(path)
-        elif platform.system() == "Darwin":
-            subprocess.Popen(["open", str(path)])
-        else:
-            subprocess.Popen(["xdg-open", str(path)])
+        subprocess.Popen(["xdg-open", str(path)])
 
     def on_theme_editor_click(self):
         try:
@@ -575,10 +553,7 @@ class TuringConfigWindow:
         except:
             # Load binary (for releases) or Python file with system interpreter
             theme_editor = next(MAIN_DIRECTORY.glob("theme-editor*"))
-            if platform.system() == "Windows":
-                subprocess.Popen([str(theme_editor), self.theme_cb.get()], shell=True)
-            else:
-                subprocess.Popen([str(theme_editor), self.theme_cb.get()])
+            subprocess.Popen([str(theme_editor), self.theme_cb.get()])
 
     def on_save_click(self):
         self.save_config_values()
@@ -593,10 +568,7 @@ class TuringConfigWindow:
         except:
             # Load binary (for releases) or Python file with system interpreter
             main_file = next(MAIN_DIRECTORY.glob("main*"))
-            if platform.system() == "Windows":
-                subprocess.Popen([str(main_file)], shell=True)
-            else:
-                subprocess.Popen([str(main_file)])
+            subprocess.Popen([str(main_file)])
 
         self.window.destroy()
 
@@ -649,22 +621,12 @@ class TuringConfigWindow:
             self.eth_cb.configure(state="readonly", foreground="#000")
             self.wl_cb.configure(state="readonly", foreground="#000")
 
-        if sys.platform == "win32":
-            import ctypes
-            is_admin = ctypes.windll.shell32.IsUserAnAdmin() != 0
-            if (hwlib == "LHM" or hwlib == "AUTO") and not is_admin:
-                self.lhm_admin_warning.place(x=370, y=460)
-                self.save_run_btn.state(["disabled"])
-            else:
-                self.lhm_admin_warning.place_forget()
-                self.save_run_btn.state(["!disabled"])
+        if hwlib == "PYTHON" or hwlib == "AUTO":
+            self.cpu_fan_label.place(x=370, y=460)
+            self.cpu_fan_cb.place(x=550, y=455, width=250)
         else:
-            if hwlib == "PYTHON" or hwlib == "AUTO":
-                self.cpu_fan_label.place(x=370, y=460)
-                self.cpu_fan_cb.place(x=550, y=455, width=250)
-            else:
-                self.cpu_fan_label.place_forget()
-                self.cpu_fan_cb.place_forget()
+            self.cpu_fan_label.place_forget()
+            self.cpu_fan_cb.place_forget()
 
     def show_hide_brightness_warning(self, e=None):
         if int(self.brightness_slider.get()) > 50 and self.model_cb.get() == TURING_MODEL and self.size_cb.get() == SIZE_3_5_INCH:

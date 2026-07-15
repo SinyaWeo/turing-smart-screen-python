@@ -19,7 +19,7 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # This file will use randomly generated data instead of real hardware sensors
-# For all platforms (Linux, Windows, macOS)
+# For Linux
 
 import random
 from typing import Tuple

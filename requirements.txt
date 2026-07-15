@@ -32,12 +32,5 @@ GPUtil~=1.4.0; python_version < "3.12"
 GPUtil @ git+https://github.com/mathoudebine/gputil.git@1.4.1-py3.13 ; python_version >= "3.12"
 
 # Following packages are for AMD GPU on Linux
-pyamdgpuinfo~=2.1.6; sys_platform=="linux" and python_version <= "3.12"
+pyamdgpuinfo~=2.1.6; python_version <= "3.12"
 # For Python > 3.12, you need to build install pyamdgpuinfo manually: see https://github.com/mathoudebine/turing-smart-screen-python/wiki/Troubleshooting#linux--macos-no-supported-gpu-found-with-an-amd-gpu-and-python--311
-
-# Following packages are for AMD GPU on Windows
-pyadl~=0.1; sys_platform=="win32"
-
-# Following packages are for LibreHardwareMonitor integration on Windows
-pythonnet~=3.0.5; sys_platform=="win32"
-pywin32>=311; sys_platform=="win32"

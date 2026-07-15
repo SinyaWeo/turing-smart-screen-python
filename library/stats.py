@@ -26,7 +26,6 @@ import datetime
 import locale
 import math
 import os
-import platform
 import sys
 from typing import List
 
@@ -49,19 +48,7 @@ CPU_FAN = config.CONFIG_DATA["config"].get("CPU_FAN", "AUTO")
 PING_DEST = config.CONFIG_DATA["config"].get("PING", "127.0.0.1")
 
 if HW_SENSORS == "PYTHON":
-    if platform.system() == 'Windows':
-        logger.warning("It is recommended to use LibreHardwareMonitor integration for Windows instead of Python "
-                       "libraries (require admin. rights)")
     import library.sensors.sensors_python as sensors
-elif HW_SENSORS == "LHM":
-    if platform.system() == 'Windows':
-        import library.sensors.sensors_librehardwaremonitor as sensors
-    else:
-        logger.error("LibreHardwareMonitor integration is only available on Windows")
-        try:
-            sys.exit(0)
-        except:
-            os._exit(0)
 elif HW_SENSORS == "STUB":
     logger.warning("Stub sensors, not real HW sensors")
     import library.sensors.sensors_stub_random as sensors
@@ -69,10 +56,7 @@ elif HW_SENSORS == "STATIC":
     logger.warning("Stub sensors, not real HW sensors")
     import library.sensors.sensors_stub_static as sensors
 elif HW_SENSORS == "AUTO":
-    if platform.system() == 'Windows':
-        import library.sensors.sensors_librehardwaremonitor as sensors
-    else:
-        import library.sensors.sensors_python as sensors
+    import library.sensors.sensors_python as sensors
 else:
     logger.error("Unsupported HW_SENSORS value in config.yaml")
     try:
@@ -359,10 +343,7 @@ class CPU:
             fan_percent = 0
             if cpu_fan_text_data['SHOW'] or cpu_fan_radial_data['SHOW'] or cpu_fan_graph_data[
                 'SHOW'] or cpu_fan_line_graph_data['SHOW']:
-                if sys.platform == "win32":
-                    logger.warning("Your CPU Fan sensor could not be auto-detected")
-                else:
-                    logger.warning("Your CPU Fan sensor could not be auto-detected. Select it from Configuration UI.")
+                logger.warning("Your CPU Fan sensor could not be auto-detected. Select it from Configuration UI.")
                 cpu_fan_text_data['SHOW'] = False
                 cpu_fan_radial_data['SHOW'] = False
                 cpu_fan_graph_data['SHOW'] = False
@@ -746,11 +727,7 @@ class Date:
             date_now = datetime.datetime.now()
 
         try:
-            if platform.system() == "Windows":
-                # Windows does not have LC_TIME environment variable, use deprecated getdefaultlocale() that returns language code following RFC 1766
-                lc_time = locale.getdefaultlocale()[0]
-            else:
-                lc_time = babel.dates.LC_TIME
+            lc_time = babel.dates.LC_TIME
         except:
             lc_time = None
 

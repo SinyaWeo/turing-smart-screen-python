@@ -27,7 +27,7 @@ You can drag and drop photos here to add them to the description.
 
 **Environment:**  
  - Revision of this project [e.g. 3.7.0, `main` branch, specific commit]
- - OS with version [e.g. Windows 11, Ubuntu 22.04]
+ - Linux distribution with version [e.g. Ubuntu 22.04, Raspberry Pi OS]
  - Python version [e.g. Python 3.13]
  - Hardware [e.g. Intel CPU, Nvidia GPU, Raspberry Pi 5 ...]
 

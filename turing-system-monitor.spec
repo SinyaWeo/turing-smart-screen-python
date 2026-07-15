@@ -6,7 +6,7 @@ configure_a = Analysis(
     ['configure.py'],
     pathex=[],
     binaries=[],
-    datas=[('res', 'res'), ('config.yaml', '.'), ('external', 'external')],
+    datas=[('res', 'res'), ('config.yaml', '.')],
     hiddenimports=['PIL', 'PIL._imagingtk', 'PIL._tkinter_finder'],
     hookspath=[],
     hooksconfig={},
@@ -33,9 +33,7 @@ configure_exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['res\\icons\\monitor-icon-17865\\icon.ico'],
     contents_directory='.',
-    version='tools\\windows-installer\\pyinstaller-version-info.txt',
 )
 
 # System Monitor main program
@@ -44,7 +42,7 @@ main_a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[('res', 'res'), ('config.yaml', '.'), ('external', 'external')],
+    datas=[('res', 'res'), ('config.yaml', '.')],
     hiddenimports=['PIL', 'PIL._imagingtk', 'PIL._tkinter_finder'],
     hookspath=[],
     hooksconfig={},
@@ -71,9 +69,7 @@ main_exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['res\\icons\\monitor-icon-17865\\icon.ico'],
     contents_directory='.',
-    version='tools\\windows-installer\\pyinstaller-version-info.txt',
 )
 
 # Theme Editor
@@ -82,7 +78,7 @@ editor_a = Analysis(
     ['theme-editor.py'],
     pathex=[],
     binaries=[],
-    datas=[('res', 'res'), ('config.yaml', '.'), ('external', 'external')],
+    datas=[('res', 'res'), ('config.yaml', '.')],
     hiddenimports=['PIL', 'PIL._imagingtk', 'PIL._tkinter_finder'],
     hookspath=[],
     hooksconfig={},
@@ -109,9 +105,7 @@ editor_exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['res\\icons\\monitor-icon-17865\\icon.ico'],
     contents_directory='.',
-    version='tools\\windows-installer\\pyinstaller-version-info.txt',
 )
 
 # Common collect task

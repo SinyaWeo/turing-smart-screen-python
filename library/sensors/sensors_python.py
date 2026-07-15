@@ -19,10 +19,9 @@
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 # This file will use Python libraries (psutil, GPUtil, etc.) to get hardware sensors
-# For all platforms (Linux, Windows, macOS) but not all HW is supported
+# For Linux, but not all HW is supported
 
 import math
-import platform
 import sys
 from collections import namedtuple
 from enum import IntEnum, auto
@@ -41,12 +40,6 @@ try:
     import pyamdgpuinfo
 except:
     pyamdgpuinfo = None
-
-# AMD GPU on Windows
-try:
-    import pyadl
-except:
-    pyadl = None
 
 PNIC_BEFORE = {}
 
@@ -159,7 +152,6 @@ class Cpu(sensors.Cpu):
                 # AMD CPU with zenpower (k10temp is in blacklist)
                 cpu_temp = sensors_temps['zenpower'][0].current
         except:
-            # psutil.sensors_temperatures not available on Windows / MacOS
             pass
         return cpu_temp
 
@@ -234,7 +226,7 @@ class Gpu(sensors.Gpu):
         else:
             logger.warning("No supported GPU found")
             DETECTED_GPU = GpuType.UNSUPPORTED
-            if sys.version_info >= (3, 11) and (platform.system() == "Linux" or platform.system() == "Darwin"):
+            if sys.version_info >= (3, 11):
                 logger.warning("If you have an AMD GPU, you may need to install some  libraries manually: see "
                                "https://github.com/mathoudebine/turing-smart-screen-python/wiki/Troubleshooting#linux--macos-no-supported-gpu-found-with-an-amd-gpu-and-python-311")
 
@@ -350,21 +342,6 @@ class GpuAmd(sensors.Gpu):
                 temperature = math.nan
 
             return load, memory_percentage, memory_used, memory_total, temperature
-        elif pyadl:
-            amd_gpu = pyadl.ADLManager.getInstance().getDevices()[0]
-
-            try:
-                load = amd_gpu.getCurrentUsage()
-            except:
-                load = math.nan
-
-            try:
-                temperature = amd_gpu.getCurrentTemperature()
-            except:
-                temperature = math.nan
-
-            # GPU memory data not supported by pyadl
-            return load, math.nan, math.nan, math.nan, temperature
 
     @staticmethod
     def fps() -> int:
@@ -381,11 +358,6 @@ class GpuAmd(sensors.Gpu):
                     for entry in entries:
                         if "gpu" in (entry.label.lower() or name.lower()):
                             return entry.percent
-
-            # Try with pyadl if psutil did not find GPU fan
-            if pyadl:
-                return pyadl.ADLManager.getInstance().getDevices()[0].getCurrentFanSpeed(
-                    pyadl.ADL_DEVICE_FAN_SPEED_TYPE_PERCENTAGE)
         except:
             pass
 
@@ -397,8 +369,6 @@ class GpuAmd(sensors.Gpu):
             if pyamdgpuinfo:
                 pyamdgpuinfo.detect_gpus()
                 return pyamdgpuinfo.get_gpu(0).query_sclk() / 1000000
-            elif pyadl:
-                return pyadl.ADLManager.getInstance().getDevices()[0].getCurrentEngineClock()
             else:
                 return math.nan
         except:
@@ -408,8 +378,6 @@ class GpuAmd(sensors.Gpu):
     def is_available() -> bool:
         try:
             if pyamdgpuinfo and pyamdgpuinfo.detect_gpus() > 0:
-                return True
-            elif pyadl and len(pyadl.ADLManager.getInstance().getDevices()) > 0:
                 return True
             else:
                 return False

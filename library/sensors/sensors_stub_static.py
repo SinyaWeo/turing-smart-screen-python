@@ -20,7 +20,7 @@
 
 # This file will use static data instead of real hardware sensors
 # Useful for theme editor
-# For all platforms (Linux, Windows, macOS)
+# For Linux
 
 from typing import Tuple
 
