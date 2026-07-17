@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-# This file will use Python libraries (psutil, GPUtil, etc.) to get hardware sensors
+# This file will use Python libraries (psutil, pynvml, etc.) to get hardware sensors
 # For Linux, but not all HW is supported
 
 import math
@@ -28,7 +28,10 @@ from enum import IntEnum, auto
 from typing import Tuple
 
 # Nvidia GPU
-import GPUtil
+try:
+    import pynvml
+except:
+    pynvml = None
 # CPU & disk sensors
 import psutil
 
@@ -237,17 +240,18 @@ class GpuNvidia(sensors.Gpu):
     @staticmethod
     def stats() -> Tuple[
         float, float, float, float, float]:  # load (%) / used mem (%) / used mem (Mb) / total mem (Mb) / temp (°C)
-        # Unlike other sensors, Nvidia GPU with GPUtil pulls in all the stats at once
-        nvidia_gpus = GPUtil.getGPUs()
+        # Unlike other sensors, Nvidia GPU with pynvml pulls in all the stats at once
+        pynvml.nvmlInit()
+        handles = [pynvml.nvmlDeviceGetHandleByIndex(i) for i in range(pynvml.nvmlDeviceGetCount())]
 
         try:
-            memory_used_all = [item.memoryUsed for item in nvidia_gpus]
+            memory_used_all = [pynvml.nvmlDeviceGetMemoryInfo(h).used / (1024 ** 2) for h in handles]
             memory_used_mb = sum(memory_used_all) / len(memory_used_all)
         except:
             memory_used_mb = math.nan
 
         try:
-            memory_total_all = [item.memoryTotal for item in nvidia_gpus]
+            memory_total_all = [pynvml.nvmlDeviceGetMemoryInfo(h).total / (1024 ** 2) for h in handles]
             memory_total_mb = sum(memory_total_all) / len(memory_total_all)
         except:
             memory_total_mb = math.nan
@@ -258,13 +262,13 @@ class GpuNvidia(sensors.Gpu):
             memory_percentage = math.nan
 
         try:
-            load_all = [item.load for item in nvidia_gpus]
-            load = (sum(load_all) / len(load_all)) * 100
+            load_all = [pynvml.nvmlDeviceGetUtilizationRates(h).gpu for h in handles]
+            load = sum(load_all) / len(load_all)
         except:
             load = math.nan
 
         try:
-            temperature_all = [item.temperature for item in nvidia_gpus]
+            temperature_all = [pynvml.nvmlDeviceGetTemperature(h, pynvml.NVML_TEMPERATURE_GPU) for h in handles]
             temperature = sum(temperature_all) / len(temperature_all)
         except:
             temperature = math.nan
@@ -279,16 +283,11 @@ class GpuNvidia(sensors.Gpu):
     @staticmethod
     def fan_percent() -> float:
         try:
-            fans = sensors_fans()
-            if fans:
-                for name, entries in fans.items():
-                    for entry in entries:
-                        if "gpu" in (entry.label.lower() or name.lower()):
-                            return entry.percent
+            pynvml.nvmlInit()
+            handle = pynvml.nvmlDeviceGetHandleByIndex(0)
+            return float(pynvml.nvmlDeviceGetFanSpeed(handle))
         except:
-            pass
-
-        return math.nan
+            return math.nan
 
     @staticmethod
     def frequency() -> float:
@@ -298,7 +297,8 @@ class GpuNvidia(sensors.Gpu):
     @staticmethod
     def is_available() -> bool:
         try:
-            return len(GPUtil.getGPUs()) > 0
+            pynvml.nvmlInit()
+            return pynvml.nvmlDeviceGetCount() > 0
         except:
             return False
 

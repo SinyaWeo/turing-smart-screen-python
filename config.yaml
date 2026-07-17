@@ -1,35 +1,34 @@
----
 config:
   # Configuration values to set up basic communication
   # Set your serial port e.g. /dev/ttyACM0
   # Use AUTO for port auto-discovery (may not work on every setup) or if device is not detected as a serial port
   # COM_PORT: "/dev/ttyACM0"
-  COM_PORT: "AUTO"
+  COM_PORT: AUTO
 
   # Theme to use (located in res/themes)
   # Use the name of the folder as value
   # Choose a theme made for your screen size (see DISPLAY_SIZE inside theme.yaml)
-  THEME: 3.5inchTheme2
+  THEME: Cyberdeck
 
   # Hardware sensors reading
   # Choose the appropriate method for reading your hardware sensors:
-  # - PYTHON         use Python libraries (psutils, GPUtil...) to read hardware sensors (not all HW is supported)
+  # - PYTHON         use Python libraries (psutils, pynvml...) to read hardware sensors (not all HW is supported)
   # - STUB / STATIC  use random/static data instead of real hardware sensors
   # - AUTO           use the best method to read hardware sensors (Python libraries)
-  HW_SENSORS: AUTO
+  HW_SENSORS: PYTHON
 
   # Network interfaces
   # Interfaces are named "eth0", "wlan0", "wlp1s0", "enp2s0"...
   # Leave the fields empty if the card does not exist on your setup
-  ETH: "" # Ethernet Card
-  WLO: "" # Wi-Fi Card
+  ETH: enp7s0 # Ethernet Card
+  WLO: '' # Wi-Fi Card
 
   # CPU fan
   # The CPU fan is amongst all fan sensors gathered from the motherboard chipset
   # If value is AUTO the system monitor will try to auto-select the CPU fan
   # If auto-detection fails, it might be necessary to manually indicate which fan is the CPU fan
   # Value must be 'controller/fan' e.g. 'nct6798/fan2'. Use configuration wizard for help in selection
-  CPU_FAN: AUTO
+  CPU_FAN: it8696/fan1
 
   # Address used for ping sensor. Can be internal/external IP (e.g. 8.8.8.8 or 192.168.0.1) or hostname (google.com)
   PING: 8.8.8.8
@@ -38,7 +37,7 @@ config:
 
   # OpenWeatherMap API KEY. Can be obtained by creating a free account on https://home.openweathermap.org/users/sign_up.
   # You need to subscribe to the 3.0 OneCallAPI that has 1000 free daily calls
-  WEATHER_API_KEY: ""
+  WEATHER_API_KEY: ''
   # Location from which to display the weather. Use for example https://www.latlong.net/ to get latitude/longitude
   WEATHER_LATITUDE: 45.75
   WEATHER_LONGITUDE: 4.85
@@ -68,7 +67,7 @@ display:
   # Display reverse: true/false
   # Set to true to reverse display orientation (landscape <-> reverse landscape, portrait <-> reverse portrait)
   # Note: Display basic orientation (portrait or landscape) is defined by the theme you have selected
-  DISPLAY_REVERSE: false
+  DISPLAY_REVERSE: true
 
   # Reset display on startup: true/false
   # By default, this program resets the display on startup, in case it is in a degraded state from previous runs.

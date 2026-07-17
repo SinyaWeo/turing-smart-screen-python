@@ -76,7 +76,7 @@ SIZE_8_INCH = "8\""
 SIZE_8_8_INCH = "8.8\""
 SIZE_8_8_INCH_NEWREV = "8.8\" / 9.2\" (V1.X new HW rev.)"
 SIZE_12_3_INCH = "12.3\""
-SIZE_2_8_INCH_NEWREV = "2.8\" round (V1.X new HW rev.)"
+SIZE_2_8_ROUND_USB = "2.8\" round (V1.X new HW rev.)"
 
 # List of sizes that can be selected
 size_list = (
