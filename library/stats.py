@@ -606,21 +606,18 @@ class Memory:
 
         display_themed_value(
             theme_data=memory_stats_theme_data['VIRTUAL']['USED'],
-            value=int(sensors.Memory.virtual_used() / 1024 ** 2),
-            min_size=5,
-            unit=" M"
+            value=f"{bytes2human(sensors.Memory.virtual_used(), '%(value).1f %(symbol)s')}",
+            min_size=6
         )
         display_themed_value(
             theme_data=memory_stats_theme_data['VIRTUAL']['FREE'],
-            value=int(sensors.Memory.virtual_free() / 1024 ** 2),
-            min_size=5,
-            unit=" M"
+            value=f"{bytes2human(sensors.Memory.virtual_free(), '%(value).1f %(symbol)s')}",
+            min_size=6
         )
         display_themed_value(
             theme_data=memory_stats_theme_data['VIRTUAL']['TOTAL'],
-            value=int((sensors.Memory.virtual_free() + sensors.Memory.virtual_used()) / 1024 ** 2),
-            min_size=5,
-            unit=" M"
+            value=f"{bytes2human(sensors.Memory.virtual_free() + sensors.Memory.virtual_used(), '%(value).1f %(symbol)s')}",
+            min_size=6
         )
 
 
